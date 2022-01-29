@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul>
+    {% for character in characters %}
+    <div>
+    <div class="card my-4">
+    
+        <div class="card-body">
+        <h1 class="card-title text-info">{{character.charName}}</h1>
+        <p class="card-text">Class: {{character.charClass}}</p>   
+        <p class="card-text">Level: {{character.charLevel}}</p>
+        <p class="card-text">Race: {{character.charRace}}</p>
+
+        {% if session['user_id'] == character.user_id %}
+        <form style="display:inline" action = "/characters/{{character.id}}" method="POST">
+        <button class="btn btn-sm btn-danger">Delete Character<i class="icon-trash"></i></button>
+    </form>
+    {% endif %}
+    </div>
+    </div>
+    {% endfor %}
+</ul>
+
+{% endblock %}
