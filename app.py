@@ -1,6 +1,5 @@
 import os, pdb, requests
-from re import L
-from flask import Flask, render_template, flash, redirect, session, request, g, jsonify
+from flask import Flask, render_template, flash, redirect, session, request, g
 from flask_debugtoolbar import DebugToolbarExtension
 
 from forms import UserForm, CharacterForm
@@ -106,17 +105,21 @@ def create_character():
         flash("You must login first", "danger")
         return redirect('/')
     logged_in = 'user_id' in session
+    resp = requests.get(f"{API_BASE_URL}classes")
+    data = resp.json()
+    race = requests.get(f"{API_BASE_URL}races")
+    racedata = race.json()
+
     form = CharacterForm()
-
-    form_choices = requests.get(f"{API_BASE_URL}classes")
-    classes = jsonify(form_choices)
-
-    form.classes.choices = [CharacterForm.charClass.data]
+   # form.charClass.choices = classes
+    for res in data['results'] : form.charClass.choices.append(res['name'])
+    for res in racedata['results'] : form.charRace.choices.append(res['name'])
+   # form.classes.choices = [CharacterForm.charClass.data]
     if form.validate_on_submit():
         charName = form.charName.data
-        charClass = api_classes
+        charClass = form.charClass.choices
         charLevel = form.charLevel.data
-        charRace = form.charRace.data
+        charRace = form.charRace.choices
         new_character = Character(charName=charName, charClass=charClass, charLevel=charLevel, charRace=charRace, user_id=session['user_id'])
 
         db.session.add(new_character)
@@ -133,7 +136,8 @@ def show_characters():
         flash("You must login first", "danger")
         return redirect('/')
     logged_in = 'user_id' in session
-    characters = Character.query.all()
+    user_id = session["user_id"]
+    characters = Character.query.filter_by(user_id = user_id)
     return render_template("characters.html", logged_in=logged_in, characters=characters)
 
 @app.route('/characters/<int:user_id>', methods=["GET", "POST"])
@@ -141,7 +145,6 @@ def your_characters(user_id):
     if 'user_id' not in session:
         flash("Please login first!", "danger")
         return redirect('login')
-    user = User.query.get_or_404(user_id)
     characters = Character.query.filter_by(user_id = user_id)
     if Character.user_id == session["user_id"]:
         db.session.delete(characters)

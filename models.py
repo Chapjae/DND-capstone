@@ -1,4 +1,3 @@
-from re import U
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
@@ -43,6 +42,6 @@ class Character(db.Model):
     charClass = db.Column(db.Text, nullable = False)
     charLevel = db.Column(db.Integer, nullable = False)
     charRace = db.Column(db.Text, nullable = False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="cascade"))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    user = db.relationship("User", backref = "characters")
+    user = db.relationship("User", backref = "characters", cascade = "all")

@@ -10,5 +10,5 @@ class UserForm(FlaskForm):
 class CharacterForm(FlaskForm):
     charName = StringField("Character Name", validators = [InputRequired()])
     charClass = SelectField("Character Class", choices=[], validators = [InputRequired()])
+    charRace = SelectField("Character Race", choices =[], validators=[InputRequired()])
     charLevel = IntegerField("Character Level", validators = [InputRequired()])
-    charRace = StringField("Character Race", validators=[InputRequired()])
